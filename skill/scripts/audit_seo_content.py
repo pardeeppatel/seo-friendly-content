@@ -348,9 +348,15 @@ def run_audit(args: argparse.Namespace) -> dict:
 
     seo_title = args.seo_title.strip()
     title_len = len(seo_title)
-    title_first_half = seo_title[: max(1, title_len // 2)] if seo_title else ""
+    kw_title_match = (
+        re.search(rf"\b{re.escape(primary)}s?\b", seo_title, flags=re.I)
+        if seo_title and primary
+        else None
+    )
     kw_in_title_first_half = (
-        count_keyword_occurrences(title_first_half, primary) > 0 if seo_title else None
+        bool(kw_title_match and kw_title_match.start() <= max(1, title_len // 2))
+        if seo_title
+        else None
     )
 
     meta_desc = args.meta_desc.strip()
