@@ -29,6 +29,18 @@
 7. **Organized Per-Article Folder Management:** Asks once for your designated output folder (remembered across future sessions in `user-config.json`), then creates a clean `<output_dir>/<url-slug>/` bundle for every article (`article.md`, `<url-slug>-featured.jpg`, `seo-metadata.md`, and `schema.json`).
 8. **Deterministic Python Auditor:** Verifies word count, keyword density, heading structure, paragraph lengths, internal/external links (`--site-url`), and scans for robotic writing patterns before final delivery.
 
+### Why Use This Over Default AI Prompts?
+
+| Capability | Default AI Prompt | SEO Friendly Content (`v1.1.0`) |
+| :--- | :--- | :--- |
+| Keyword & Title Strategy | Guesses a generic title | Checks focus keyword first, proposes **10 `≤ 60`-char titles** (keyword in first 50%) with regeneration |
+| Word Count & Structure | Unpredictable length & walls of text | Enforces exact word target, **40–60w Quick Answer**, TOC, `< 120`-word paragraphs, comparison table & FAQ |
+| Keyword Density & SERP Limits | Keyword stuffing or missing meta tags | Enforces **1.0%–1.5% density**, `≤ 60`-char Meta Title, `120–160`-char Meta Description & concise URL slug |
+| Human Writing Quality | Heavy AI buzzwords & fluff closings | Strips **26+ robotic words**, `-ing` puffery, negative parallelisms, rule-of-three & template closings |
+| Research & Linking | Fake stats, broken links & placeholders | Verified HTTP sources, zero placeholders, plus **real same-site links** when your Website URL is set |
+| Featured Image & Files | Raw chat text only | **Branded 16:9 featured image**, `Article` + `FAQPage` JSON-LD & clean **`<folder>/<slug>/`** file bundle |
+| Quality Verification | None | Deterministic **0–100 Python SEO & anti-AI audit** before final output |
+
 ---
 
 ## Installation
@@ -69,6 +81,16 @@ git clone https://github.com/PardeepPatel/seo-friendly-content.git
 cd seo-friendly-content
 node bin/cli.js --global
 ```
+
+### Method C: No-CLI Install (Bloggers, Writers & Non-Developers)
+
+No Node.js or Terminal required:
+
+1. Click the green **`Code`** button at the top of this repository → **`Download ZIP`** and unzip it.
+2. Copy the `skill/` folder into your AI tool's skills folder and rename it `seo-friendly-content`:
+   * **Antigravity (Global):** `~/.gemini/config/skills/seo-friendly-content`
+   * **Workspace Project:** `.agents/skills/seo-friendly-content` (or `.cursor/skills/seo-friendly-content` / `.claude/skills/seo-friendly-content`)
+3. **Or use anywhere:** Open `skill/SKILL.md` (along with the three files in `skill/references/`) and paste them into your AI assistant's custom instructions or system prompt.
 
 ---
 
@@ -116,6 +138,29 @@ Once installed, give your AI assistant any content topic or refresh request:
    * **Clean, Publish-Ready Article** (`H1` → Quick Answer → TOC → Body → `4+` Media Briefs → Table → Optional FAQ)
    * **Copy-Paste JSON-LD Schema + Automated Audit Scorecard** (`word_count`, `density %`, `paragraphs > 120 words`, `headings`, `human_writing_scan`)
 
+### Before vs. After Prose Quality
+
+**Default AI Draft (flagged by human-writing audit):**
+> *"In today's fast-paced digital landscape, cloud cost optimization serves as a pivotal pillar for modern engineering teams, underscoring the intricate interplay between scalability and budget discipline. Additionally, leveraging FinOps not only cuts waste, but also fosters enduring resilience across multifaceted workloads."*
+
+**After `seo-friendly-content` Human-Writing Pass:**
+> *"Cloud bills climb fastest when idle dev clusters and unattached volumes run untouched over weekends. Assigning ownership tags by team and scheduling non-production shutdowns cuts monthly waste quickly—no complex FinOps overhaul required."*
+
+### Sample Pre-Publish Audit Output
+
+```json
+{
+  "score_summary": { "overall_score": 100, "rating": "Strong (81-100)" },
+  "word_count": 2961,
+  "meta_title": { "length": 53, "ok_under_60": true, "keyword_in_first_50_pct": true },
+  "meta_description": { "length": 144, "ok_120_to_160": true, "keyword_present": true },
+  "keywords": { "primary_density_pct": 1.35, "density_status": "optimal (1.0-1.5%)" },
+  "paragraphs": { "over_120_words": [] },
+  "media_and_links": { "total_media_items": 9, "primary_in_alt_text": true },
+  "human_writing_scan": { "issues_count": 0 }
+}
+```
+
 ### Running the Standalone SEO Auditor CLI
 
 ```bash
@@ -162,7 +207,8 @@ seo-friendly-content/
 
 ---
 
-## Credits
+## Credits & More Skills
 
 * **Developed by:** **[Pardeep Kumar](https://github.com/PardeepPatel)**
 * **Powered by:** **[ToolNPlay.com](https://ToolNPlay.com)**
+* **Companion Design Skill:** **[ui-ux-ultra](https://github.com/PardeepPatel/ui-ux-ultra)** — 200-palette UI/UX design system & theme compiler for web and mobile apps.
