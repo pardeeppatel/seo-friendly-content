@@ -12,7 +12,7 @@ const SKILL_NAME = "seo-friendly-content";
 
 function showHelp() {
   console.log(`
-SEO Friendly Content v1.0.0 — Interactive On-Page SEO & Human-Writing Skill
+SEO Friendly Content v1.1.0 — Interactive On-Page SEO & Human-Writing Skill
   Developed by Pardeep Kumar | Powered by ToolNPlay.com (https://ToolNPlay.com)
   GitHub: https://github.com/PardeepPatel/seo-friendly-content
 
@@ -70,11 +70,12 @@ if (args.includes("--audit")) {
   const sourceSkill = path.join(__dirname, "..", "skill");
   const actionWord = isUpdate ? "updated" : "installed";
 
-  console.log(`\nSEO Friendly Content v1.0.0 (Developed by Pardeep Kumar | ToolNPlay.com) ${actionWord} to:`);
+  console.log(`\nSEO Friendly Content v1.1.0 (Developed by Pardeep Kumar | ToolNPlay.com) ${actionWord} to:`);
   for (const targetBase of targets) {
     fs.mkdirSync(targetBase, { recursive: true });
     fs.cpSync(sourceSkill, targetBase, { recursive: true, force: true });
-    console.log(`  - ${targetBase}`);
+    const hasConfig = fs.existsSync(path.join(targetBase, "user-config.json"));
+    console.log(`  - ${targetBase}${hasConfig ? " (preserved existing user-config.json)" : ""}`);
   }
   console.log(`\nReady! Ask your AI assistant: "Write an SEO article using seo-friendly-content"\n`);
 }

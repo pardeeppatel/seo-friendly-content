@@ -1,6 +1,6 @@
 {
   "name": "seo-friendly-content",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Interactive On-Page SEO & Human-Writing Skill with 16:9 Featured Image Workflow and Deterministic Linter for Antigravity, Cursor & Claude Code",
   "main": "bin/cli.js",
   "bin": {

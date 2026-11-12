@@ -1,9 +1,9 @@
-# SEO Friendly Content v1.0.0
+# SEO Friendly Content v1.1.0
 
-> **Interactive On-Page SEO Engine, Human-Writing Polisher & 16:9 Featured Image Workflow**  
+> **Interactive On-Page SEO Engine, Human-Writing Polisher & Branded 16:9 Featured Image Workflow**  
 > *Crafted for Antigravity, Cursor, Claude Code & Generic AI Coding Assistants.*
 
-[![Version](https://img.shields.io/badge/version-1.0.0-indigo.svg)](package.json)
+[![Version](https://img.shields.io/badge/version-1.1.0-indigo.svg)](package.json)
 [![License: Free to Use (Not Open Source)](https://img.shields.io/badge/License-Free%20to%20Use%20(Proprietary)-blue.svg)](LICENSE)
 [![Credit](https://img.shields.io/badge/Developed%20by-Pardeep%20Kumar-orange.svg)](https://github.com/PardeepPatel)
 [![Powered By](https://img.shields.io/badge/Powered%20by-ToolNPlay.com-purple.svg)](https://ToolNPlay.com)
@@ -25,8 +25,9 @@
 3. **Full On-Page SEO Compliance:** Enforces clean URL slugs (`≤ 75` chars total URL), meta descriptions (`120–160` chars), first-10% keyword placement, `1.0%–1.5%` keyword density (without awkward pseudo-stuffing), strict `H1 → H2 → H3` hierarchy, Table of Contents, short paragraphs (`≤ 120` words), `4+` media briefs with alt text, and authoritative external/internal link slots.
 4. **Human-Writing Guardrails:** Actively strips robotic vocabulary clusters, trailing `-ing` puffery, negative parallelisms, rule-of-three padding, spaced em-dash spam, and placeholder leaks.
 5. **Up-to-Date Grounding (Zero Dummy Data):** Uses real, current facts and verifiable sources with zero fabricated URLs or fake statistics.
-6. **16:9 Website-Ready Featured Image:** Generates (or prepares) a 16:9 featured image with an SEO filename and keyword-rich alt text ready to upload straight to your site.
-7. **Deterministic Python Auditor:** Verifies word count, keyword density, heading structure, paragraph lengths, and scans for robotic writing patterns before final delivery.
+6. **16:9 Website-Ready Featured Image (with Optional Site Branding):** Generates (or prepares) a 16:9 featured image saved cleanly with its SEO filename, keyword-rich alt text, and subtle corner branding when you provide your main Website URL.
+7. **Organized Per-Article Folder Management:** Asks once for your designated output folder (remembered across future sessions in `user-config.json`), then creates a clean `<output_dir>/<url-slug>/` bundle for every article (`article.md`, `<url-slug>-featured.jpg`, `seo-metadata.md`, and `schema.json`).
+8. **Deterministic Python Auditor:** Verifies word count, keyword density, heading structure, paragraph lengths, internal/external links (`--site-url`), and scans for robotic writing patterns before final delivery.
 
 ---
 
@@ -102,17 +103,18 @@ Once installed, give your AI assistant any content topic or refresh request:
 
 ### Step-by-Step Interactive Flow
 
-1. **Focus Keyword Check:** The assistant asks whether you already have a Focus Keyword (and optional Secondary Keywords) or want suggestions.
-2. **10 SEO Title Suggestions:**
+1. **First-Time Folder & Optional Website Setup:** On your first run, the assistant asks for a **designated output folder** (saved to `user-config.json` and reused automatically on future runs) plus an **optional Website URL** (used for better internal linking, JSON-LD URLs, and subtle 16:9 featured image branding).
+2. **Focus Keyword Check:** The assistant asks whether you already have a Focus Keyword (and optional Secondary Keywords) or want suggestions.
+3. **10 SEO Title Suggestions:**
    * If you **have** a Focus Keyword, it generates **10 titles** built around that keyword (keyword in the first 50%, `≤ 60` chars, number + power word + sentiment).
    * If you **don't**, it proposes **10 Title + Focus Keyword + Secondary Keyword** pairs.
    * Pick `#1–#10` or ask to regenerate 10 fresh options.
-3. **Word Count & FAQ Selection:** Choose your target length (`< 1,000`, `1,000–1,500`, `1,500–2,000`, `2,000–2,500`, or `> 2,500` words) and whether to include a schema-ready **FAQ section** (`Yes` / `No`).
-4. **Final Deliverable Package:** You receive:
-   * **SEO Metadata Card** (SEO Title, Meta Description, Slug, Keywords)
-   * **16:9 Featured Image** (generated asset or prompt + SEO filename + alt text)
-   * **Clean, Publish-Ready Article** (`H1` → TOC → Body → `4+` Media Briefs → Optional FAQ)
-   * **Automated Audit Scorecard** (`word_count`, `density %`, `paragraphs > 120 words`, `headings`, `human_writing_scan`)
+4. **Word Count & FAQ Selection:** Choose your target length (`< 1,000`, `1,000–1,500`, `1,500–2,000`, `2,000–2,500`, or `> 2,500` words) and whether to include a schema-ready **FAQ section** (`Yes` / `No`).
+5. **Organized Output Folder + Chat Deliverable:** Saves `<output_dir>/<url-slug>/` (`article.md`, `<url-slug>-featured.jpg`, `seo-metadata.md`, `schema.json`) and outputs all 4 copy-paste blocks in chat:
+   * **SEO Metadata & Saved Bundle Card** (Meta Title, Meta Description, Slug, Keywords, Saved Path)
+   * **16:9 Featured Image** (branded if Website URL is set, with SEO filename & alt text)
+   * **Clean, Publish-Ready Article** (`H1` → Quick Answer → TOC → Body → `4+` Media Briefs → Table → Optional FAQ)
+   * **Copy-Paste JSON-LD Schema + Automated Audit Scorecard** (`word_count`, `density %`, `paragraphs > 120 words`, `headings`, `human_writing_scan`)
 
 ### Running the Standalone SEO Auditor CLI
 
@@ -123,6 +125,7 @@ python3 skill/scripts/audit_seo_content.py article.md \
   --seo-title "Your SEO Title Here" \
   --meta-desc "Your 120-160 character meta description containing your focus keyword." \
   --slug "your-focus-keyword" \
+  --site-url "https://yoursite.com" \
   --target-min 1500 --target-max 2000
 ```
 

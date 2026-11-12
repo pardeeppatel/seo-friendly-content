@@ -23,12 +23,23 @@ An interactive, multi-step workflow for producing **search-optimized, natural, h
 
 Do **not** jump straight into writing a full article when the user provides only a topic. Follow this exact 4-phase interactive loop, stopping at each gate for user confirmation:
 
-### Phase 1: Topic & Focus Keyword Intake
-1. Read the user's topic, niche, or existing draft.
-2. Check whether the user has already specified a **Focus Keyword**.
-3. If not provided, **STOP and ask**:
-   - *"Do you already have a **Focus Keyword** (and optional Secondary Keywords) you are targeting, or should I suggest Focus Keywords along with the titles?"*
-   - *(Optional)* *"Feel free to share your target audience, tone, or any existing website URLs you want linked internally."*
+### Phase 1: Settings Check, Topic & Focus Keyword Intake
+1. **Check Persistent User Settings (`<skill_path>/user-config.json`):**
+   - Look for `<skill_path>/user-config.json`:
+     ```json
+     {
+       "output_dir": "/path/to/designated-folder",
+       "website_url": "https://yoursite.com",
+       "brand_name": "YourSite.com"
+     }
+     ```
+   - **If `user-config.json` already exists** and `output_dir` is set: reuse the saved `output_dir` and optional `website_url`/`brand_name` automatically without re-asking (briefly note them in one line; only update if the user asks to change them).
+2. Read the user's topic, niche, or existing draft and check whether they already provided a **Focus Keyword**, **Designated Output Folder**, or **Main Website URL**.
+3. **STOP and ask cleanly for any missing items in one combined intake message:**
+   - **Focus Keyword** *(if not provided)*: *"Do you already have a **Focus Keyword** (and optional Secondary Keywords) you are targeting, or should I suggest Focus Keywords along with the titles?"*
+   - **Designated Output Folder** *(FIRST TIME ONLY, when `user-config.json` has no `output_dir`)*: *"Where should I save your generated content? Each article gets its own subfolder `<folder>/<url-slug>/` holding the article, SEO-named featured image, metadata, and JSON-LD schema. Share a folder path, or reply `default` to use `./seo-content` in your current workspace. (Saved for future runs.)"*
+   - **Main Website URL *(Optional — FIRST TIME ONLY, or whenever changing site)*:** *"Optional: What is your main **Website URL** (e.g., `https://yoursite.com`)? If shared, I will use it for better internal linking, JSON-LD schema URLs, and subtle domain branding on your 16:9 featured image. (Reply `skip` to leave blank.)"*
+4. As soon as the user confirms their folder (and optional website URL, or `skip`), save `<skill_path>/user-config.json` immediately so next time the skill opens ready to use that exact folder and site. *(Store `website_url: ""` when skipped so you do not re-ask on future runs.)*
 
 ### Phase 2: 10 SEO Title Suggestions (Select or Regenerate Loop)
 First, silently identify the topic's **Search Intent** (*Informational How-To, Listicle, Comparison/Review, Product/Transactional, or Content Refresh*) so the 10 titles span diverse, high-CTR angles rather than repeating one template.
@@ -62,14 +73,17 @@ Once the title and Focus Keyword are confirmed, **STOP and ask in one combined p
 2. **Should we include an FAQ section in the content?** (`Yes` / `No`)
 3. *(Optional)* **First-Hand Experience / E-E-A-T & Publishing Context:** Any personal experience, case study, brand voice, internal link URLs, or output format preference (`Markdown` vs. `Clean HTML`)?
 
-### Phase 4: Grounded Research, Content Generation, 16:9 Featured Image & Audit
-Execute all 5 sub-steps below before delivering the final package:
+### Phase 4: Grounded Research, Content Generation, Branded 16:9 Image, Audit & Export
+Execute all 6 sub-steps below before delivering the final package:
 
-#### 4A. Up-to-Date Grounding (Zero Fake Data / Zero Dummy Content)
-- Use live web search/browsing tools when available to gather **current facts, up-to-date statistics, pricing/dates, and real authoritative external sources** (never direct competitors).
+#### 4A. Up-to-Date Grounding & Website Internal Linking (Zero Fake Data)
+- Use live web search/browsing tools when available to gather **current facts, up-to-date statistics, pricing/dates, and real authoritative external sources** (never direct competitors of the user's site).
 - Strip any tracking parameters (`utm_source`, `referrer`, etc.) from URLs.
-- **Zero Fabrication Rule:** Never invent statistics, years, quotes, case studies, DOIs, ISBNs, or URLs. Never output placeholders like `[INSERT_URL]`, `2026-XX-XX`, or `example.com/source`.
-- For internal links where the user has not supplied real site URLs yet, insert clear editorial slots: `[Internal Link: <descriptive anchor text> -> link to your <topic> page]`.
+- **Website URL Internal Linking (when `website_url` is set):**
+  - Search `site:<domain> <topic keywords>` via web search when available to discover **verified live pages** on the user's site that fit naturally as internal links.
+  - Only insert full internal URLs you directly verified in search results or user input. Never guess or invent URLs on their domain.
+  - For unverified related topics (or when no `website_url` is set), insert clear editorial slots: `[Internal Link: <descriptive anchor text> -> link to your <topic> page]` (or mention `<domain>` as the target site).
+- **Zero Fabrication Rule:** Never invent statistics, years, quotes, case studies, DOIs, ISBNs, or URLs. Never output placeholders like `[INSERT_URL]` or `2026-XX-XX`.
 
 #### 4B. On-Page SEO, SERP Reach & Readability Execution
 Follow [`references/on-page-seo-rules.md`](./references/on-page-seo-rules.md) strictly:
@@ -93,9 +107,9 @@ Follow [`references/on-page-seo-rules.md`](./references/on-page-seo-rules.md) st
   - Include at least **4** in-article image/diagram/video briefs (plus the 16:9 Featured Image), each specifying:
     - Descriptive SEO filename (`.jpg` for photos, `.png` for diagrams/graphics with transparency)
     - `Alt Text` containing the Primary Focus Keyword (naturally on primary visuals)
-- **FAQ Block & JSON-LD Schema (if user chose `Yes`):**
-  - Add `4–6` concise, high-intent questions (`H2: Frequently Asked Questions` → `H3` per question) with direct, schema-ready answers.
-  - Generate valid copy-paste **JSON-LD Schema** (`Article`, plus `FAQPage` when FAQ is included) matching the exact Meta Title, Meta Description, and Q&A content.
+- **FAQ Block & JSON-LD Schema (always include `Article`; add `FAQPage` if user chose `Yes`):**
+  - Add `4–6` concise, high-intent questions (`H2: Frequently Asked Questions` → `H3` per question) with direct, schema-ready answers when FAQ is enabled.
+  - Generate valid copy-paste **JSON-LD Schema** (`Article`, plus `FAQPage` when FAQ is included) matching the exact Meta Title, Meta Description, and Q&A content. When `website_url` is configured, populate `mainEntityOfPage.@id`, `publisher.name`, `publisher.url`, and featured `image` paths with `<website_url>/<url-slug>`.
 
 #### 4C. Human-Writing & Anti-AI Polish Pass
 Review the entire draft against [`references/human-writing-rules.md`](./references/human-writing-rules.md) and eliminate robotic writing patterns:
@@ -106,41 +120,52 @@ Review the entire draft against [`references/human-writing-rules.md`](./referenc
 - **No Formulaic Closings or Templates:** Do not use `"Challenges and Future Prospects"` or `"In conclusion"` / `"In summary"` / `"Overall"` sections. End with concrete next steps or a direct takeaway.
 - **Clean Formatting & Zero Meta-Chatter:** No emoji icons in headings/lists, no bold-label bullet spam (`**Point**: explanation`), no spaced em-dash (` — `) punch-up overuse, and no conversational filler inside the article body.
 
-#### 4D. Featured Image Generation (16:9 Website-Ready)
+#### 4D. Branded Featured Image Generation (16:9 Website-Ready)
 Every completed article must include a **16:9 featured image** ready to post directly on the user's website:
-1. Craft a clean, topic-matched **16:9 visual concept** tied directly to the confirmed title and Primary Focus Keyword (avoid garbled text inside generated visuals unless clean editorial typography is needed).
-2. **If an image-generation tool or subagent is available:**
-   - Generate the **16:9 aspect ratio** featured image directly and save it with an SEO-friendly filename (e.g., `<primary-keyword-slug>-featured.jpg` or `.png`).
-   - Return the **saved image path**, **recommended upload filename**, and **Alt Text** (containing the Primary Focus Keyword).
-3. **If no image-generation tool is available** in the current environment:
-   - Output a ready-to-run **16:9 Featured Image Prompt** (explicitly specifying `16:9` widescreen editorial composition), **SEO Filename**, and **Alt Text** so the user can generate and upload it immediately.
+1. Craft a clean, topic-matched **16:9 visual concept** tied directly to the confirmed title and Primary Focus Keyword (avoid cluttered text overlays inside generated visuals).
+2. **Optional Website Branding:** If `website_url` (or `brand_name`) is set in `user-config.json` or prompt context, add a **subtle, crisp domain badge or corner watermark** (e.g., minimalist bottom-right pill or clean editorial corner typography reading `<domain>` such as `YourSite.com`) without obscuring the main subject. Inspect the generated image visually to confirm the domain spelling is accurate and clean.
+3. **If an image-generation tool or subagent is available:**
+   - Generate the **16:9 aspect ratio** featured image directly and save/copy it into the article's folder (`<output_dir>/<url-slug>/<url-slug>-featured.jpg` or `.png`).
+   - Return the **saved image path**, **SEO filename** (`<url-slug>-featured.jpg` / `.png`), and **Alt Text** (containing the Primary Focus Keyword).
+4. **If no image-generation tool is available** in the current environment:
+   - Output a ready-to-run **16:9 Featured Image Prompt** (explicitly specifying `16:9` widescreen editorial composition + subtle corner branding `<domain>` when `website_url` is set), **SEO Filename**, and **Alt Text** so the user can generate and save it into `<output_dir>/<url-slug>/` immediately.
 
 #### 4E. Automated SEO & Human-Writing Audit
-Before sending the final response, run the local audit script if shell access is available:
+Before saving and sending the final response, run the local audit script if shell access is available:
 
 ```bash
-python3 <skill_path>/scripts/audit_seo_content.py <article.md> \
+python3 <skill_path>/scripts/audit_seo_content.py <output_dir>/<url-slug>/article.md \
   --keyword "<primary focus keyword>" \
   --secondary "<secondary 1>,<secondary 2>" \
   --seo-title "<seo title>" \
   --meta-desc "<meta description>" \
   --slug "<url-slug>" \
+  --site-url "<website_url_if_set>" \
   --target-min <min_words> --target-max <max_words>
 ```
+
+#### 4F. Save Organized Article Bundle (`<output_dir>/<url-slug>/`)
+Inside the user's saved `output_dir`, create a dedicated subfolder named after the article's **URL Slug** (`<output_dir>/<url-slug>/`) so every article and its matching image stay neatly isolated and easy to manage:
+- `<output_dir>/<url-slug>/article.md` — clean publish-ready article (or `article.html` if requested)
+- `<output_dir>/<url-slug>/<url-slug>-featured.jpg` *(or `.png`)* — 16:9 featured image renamed cleanly to its exact SEO filename
+- `<output_dir>/<url-slug>/seo-metadata.md` — Meta Title, Meta Description, URL Slug, Primary/Secondary Keywords, Website URL, Featured Image Alt Text, and Audit Scorecard
+- `<output_dir>/<url-slug>/schema.json` — valid JSON-LD `Article` (+ optional `FAQPage`) schema
 
 ---
 
 ## Output Format
 
-Present the final deliverable cleanly in four clearly separated blocks so the user can copy-paste everything straight into their CMS without stripping AI commentary:
+Present the final deliverable cleanly in four clearly separated blocks so the user can either use the saved bundle in `<output_dir>/<url-slug>/` or copy-paste directly into their CMS:
 
-1. **SEO Metadata & 16:9 Featured Image Card**
+1. **SEO Metadata, Saved Folder & 16:9 Featured Image Card**
+   - **Saved Article Folder** (`<output_dir>/<url-slug>/` listing the saved files)
+   - **Website URL** (if configured)
    - **Meta Title** (with exact character count, e.g. `54/60 chars`)
    - **Meta Description** (with exact character count, e.g. `148/160 chars`)
    - **URL Slug**
    - **Primary Focus Keyword**
    - **Secondary Keywords** (if any)
-   - **16:9 Featured Image** (saved path or 16:9 prompt + SEO filename + Alt Text)
+   - **16:9 Featured Image** (saved path in `<url-slug>/`, branding status, SEO filename, Alt Text — or 16:9 prompt when image-gen is unavailable)
 2. **Clean, Publish-Ready Article** (`H1` → Opening + 40–60w Quick Answer → TOC → Body with `4+` media briefs + Table → Optional FAQ → Concrete ending).
 3. **Copy-Paste JSON-LD Schema** (`Article` schema, plus `FAQPage` schema if FAQ was enabled).
 4. **Pre-Publish SEO & Human-Writing Scorecard** (Numeric `overall_score` out of `100`, word count, keyword density `%`, max paragraph length, heading hierarchy check, link/media check, and `0` robotic-tells check).

@@ -36,3 +36,8 @@ dist/
 build/
 .temp/
 .cache/
+
+# Local Skill Config & Generated Output
+user-config.json
+**/user-config.json
+seo-content/

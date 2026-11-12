@@ -13,6 +13,7 @@ import json
 import re
 import sys
 from pathlib import Path
+from urllib.parse import urlparse
 
 ROBOTIC_VOCAB_PATTERNS: list[tuple[str, str]] = [
     ("delve", r"\bdelv(?:e|ed|es|ing)\b"),
@@ -152,20 +153,40 @@ def audit_headings(md: str, primary: str, secondary: list[str]) -> dict:
     }
 
 
-def audit_media_and_links(md: str, primary: str) -> dict:
+def _normalize_host(url: str) -> str:
+    """Extract normalized lowercase domain without leading www."""
+    parsed = urlparse(url if "://" in url else f"https://{url}")
+    host = parsed.netloc.lower().split(":")[0]
+    return host[4:] if host.startswith("www.") else host
+
+
+def audit_media_and_links(md: str, primary: str, site_url: str = "") -> dict:
     """Check Markdown images, media briefs, alt text, and internal/external links."""
     md_images = re.findall(r"!\[([^\]]*)\]\(([^)]+)\)", md)
-    alt_matches = list(re.finditer(r"Alt(?:\s+Text)?:\s*[`\"']?([^`\"\n]+)", md, flags=re.I))
+    alt_matches = list(
+        re.finditer(r"Alt(?:\s+Text)?[*_]*\s*:\s*[*_]*\s*[`\"']?([^`\"\n]+)", md, flags=re.I)
+    )
     brief_matches = re.findall(
         r"(?:IMAGE|VIDEO|MEDIA|INFOGRAPHIC)\s*(?:BRIEF|PLACEHOLDER)?", md, flags=re.I
     )
 
-    alts = [alt for alt, _ in md_images] + [m.group(1).strip() for m in alt_matches]
+    alts = [alt for alt, _ in md_images] + [
+        m.group(1).strip().strip("*_") for m in alt_matches
+    ]
     primary_in_alt = any(count_keyword_occurrences(a, primary) > 0 for a in alts)
 
+    site_host = _normalize_host(site_url) if site_url.strip() else ""
     links = re.findall(r"(?<!!)\[([^\]]+)\]\(([^)]+)\)", md)
-    external_links = [u for _, u in links if u.startswith(("http://", "https://"))]
-    internal_links = [u for _, u in links if u.startswith("/") and not u.startswith("//")]
+    external_links: list[str] = []
+    internal_links: list[str] = []
+    for _, url in links:
+        if url.startswith("/") and not url.startswith("//"):
+            internal_links.append(url)
+        elif url.startswith(("http://", "https://")):
+            if site_host and _normalize_host(url) == site_host:
+                internal_links.append(url)
+            else:
+                external_links.append(url)
     internal_slots = len(re.findall(r"\[Internal Link:", md, flags=re.I))
 
     return {
@@ -365,7 +386,7 @@ def run_audit(args: argparse.Namespace) -> dict:
 
     slug_info = check_slug(args.slug.strip(), primary)
     headings = audit_headings(raw, primary, secondary)
-    media_links = audit_media_and_links(raw, primary)
+    media_links = audit_media_and_links(raw, primary, site_url=args.site_url)
     robotic_tells = scan_robotic_tells(raw)
 
     score_summary = compute_score(
@@ -443,6 +464,7 @@ def main() -> int:
     parser.add_argument("--seo-title", default="", help="SEO title to check (<=60 chars)")
     parser.add_argument("--meta-desc", default="", help="Meta description to check (120-160 chars)")
     parser.add_argument("--slug", default="", help="URL slug to check")
+    parser.add_argument("--site-url", default="", help="Optional main website URL to classify same-domain internal links")
     parser.add_argument("--target-min", type=int, default=None, help="Minimum target word count")
     parser.add_argument("--target-max", type=int, default=None, help="Maximum target word count")
     args = parser.parse_args()
