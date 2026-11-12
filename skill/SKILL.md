@@ -51,7 +51,7 @@ First, silently identify the topic's **Search Intent** (*Informational How-To, L
 
 Repeat Phase 2 until the user confirms the title and Focus Keyword.
 
-### Phase 3: Word Count & FAQ Confirmation
+### Phase 3: Word Count, FAQ & Experience Context Confirmation
 Once the title and Focus Keyword are confirmed, **STOP and ask in one combined prompt** (use a structured multi-choice prompt when available, or a clean numbered list):
 1. **How many words are you looking for?**
    - `Less than 1,000 words` *(aim for `600–999` words on articles to avoid thin-content penalties, or `~200–400` words for product pages)*
@@ -60,7 +60,7 @@ Once the title and Focus Keyword are confirmed, **STOP and ask in one combined p
    - `2,000–2,500 words`
    - `More than 2,500 words` *(Recommended for competitive pillar guides — maximum depth score)*
 2. **Should we include an FAQ section in the content?** (`Yes` / `No`)
-3. *(Optional)* Any specific internal links, brand details, product links, or output format preference (`Markdown` vs. `Clean HTML`)?
+3. *(Optional)* **First-Hand Experience / E-E-A-T & Publishing Context:** Any personal experience, case study, brand voice, internal link URLs, or output format preference (`Markdown` vs. `Clean HTML`)?
 
 ### Phase 4: Grounded Research, Content Generation, 16:9 Featured Image & Audit
 Execute all 5 sub-steps below before delivering the final package:
@@ -71,28 +71,31 @@ Execute all 5 sub-steps below before delivering the final package:
 - **Zero Fabrication Rule:** Never invent statistics, years, quotes, case studies, DOIs, ISBNs, or URLs. Never output placeholders like `[INSERT_URL]`, `2026-XX-XX`, or `example.com/source`.
 - For internal links where the user has not supplied real site URLs yet, insert clear editorial slots: `[Internal Link: <descriptive anchor text> -> link to your <topic> page]`.
 
-#### 4B. On-Page SEO & Readability Execution
+#### 4B. On-Page SEO, SERP Reach & Readability Execution
 Follow [`references/on-page-seo-rules.md`](./references/on-page-seo-rules.md) strictly:
-- **SEO Metadata Header:**
-  - **SEO Title:** Confirmed title (`≤ 60` chars, keyword in first 50%).
-  - **Meta Description:** `120–160` characters, unique, compelling CTR summary containing the Primary Focus Keyword.
-  - **URL Slug:** Short, lowercase, descriptive, containing the Primary Focus Keyword (target full URL `≤ 75` chars).
-  - **Keywords:** 1 Primary Focus Keyword + 2–4 Secondary Keywords.
+- **SEO Metadata Package (Mandatory — Search-Engine-Limit Validated for Max SERP Reach):**
+  - **Meta Title:** `50–60` characters max (strictly `≤ 60` chars so desktop/mobile SERPs do not truncate), Primary Focus Keyword within the first 50%.
+  - **Meta Description:** `120–160` characters (sweet spot `140–155` chars for zero truncation on mobile and desktop), unique, compelling CTR copy containing the Primary Focus Keyword.
+  - **URL Slug:** Short, lowercase, descriptive, containing the meaningful Primary Focus Keyword terms (trim stop words; keep full URL `≤ 75` chars).
+  - **Primary Focus Keyword:** Clearly labeled single target keyword.
+  - **Secondary Keywords:** `2–4` related / long-tail keywords (explicitly state `None` only if single-keyword product copy).
 - **Keyword Placement & Anti-Pseudo-Stuffing:**
   - Place the Primary Focus Keyword naturally in the **first 10%** of the article (first paragraph).
-  - Maintain **1.0%–1.5% keyword density** (hard ceiling `< 2.5%`). If a focus keyword is grammatically clunky, place the exact phrase cleanly in Title, Meta, Slug, Opening 10%, one `H2`/`H3`, and one Image Alt Text, then use smooth grammatical variations and synonyms throughout the body.
+  - Maintain **1.0%–1.5% keyword density** (hard ceiling `< 2.5%`). If a focus keyword is grammatically clunky, place the exact phrase cleanly in Meta Title, Meta Description, Slug, Opening 10%, one `H2`/`H3`, and one Image Alt Text, then use smooth grammatical variations and synonyms throughout the body.
   - Weave Primary and Secondary Keywords naturally into `H2`/`H3` subheadings.
-- **Structure & Scannability:**
+- **Structure, Scannability & AI-Search Readiness (GEO):**
   - **Strictly one `H1`** (the main article title), followed by logical `H2` → `H3` → `H4` nesting (never skip levels like `H1 → H4`).
-  - Include a **Table of Contents** for posts `≥ 1,000` words.
+  - Include a **40–60 word direct Quick Answer** block right after the opening intro for Featured Snippets and AI-search citations.
+  - Include a **Table of Contents** for posts `≥ 1,000` words and at least **1 structured comparison/summary table**.
   - Keep **every paragraph under 120 words** (target 2–4 sentences / ~40–80 words; zero walls of text).
-  - Provide real value: concrete examples, actionable steps, comparisons, and original takeaways (never thin filler).
+  - Provide real value: concrete examples, actionable steps, real-world experience (from Phase 3 if supplied), and original takeaways (never thin filler).
 - **Media Briefs (`4+` visuals for maximum media score):**
   - Include at least **4** in-article image/diagram/video briefs (plus the 16:9 Featured Image), each specifying:
     - Descriptive SEO filename (`.jpg` for photos, `.png` for diagrams/graphics with transparency)
     - `Alt Text` containing the Primary Focus Keyword (naturally on primary visuals)
-- **FAQ Block (if user chose `Yes`):**
+- **FAQ Block & JSON-LD Schema (if user chose `Yes`):**
   - Add `4–6` concise, high-intent questions (`H2: Frequently Asked Questions` → `H3` per question) with direct, schema-ready answers.
+  - Generate valid copy-paste **JSON-LD Schema** (`Article`, plus `FAQPage` when FAQ is included) matching the exact Meta Title, Meta Description, and Q&A content.
 
 #### 4C. Human-Writing & Anti-AI Polish Pass
 Review the entire draft against [`references/human-writing-rules.md`](./references/human-writing-rules.md) and eliminate robotic writing patterns:
@@ -129,8 +132,15 @@ python3 <skill_path>/scripts/audit_seo_content.py <article.md> \
 
 ## Output Format
 
-Present the final deliverable cleanly in three clearly separated blocks so the user can copy-paste the article straight into their CMS without stripping AI commentary:
+Present the final deliverable cleanly in four clearly separated blocks so the user can copy-paste everything straight into their CMS without stripping AI commentary:
 
-1. **SEO Metadata & Featured Image Card** (SEO Title + char count, Meta Description + char count, URL Slug, Primary/Secondary Keywords, 16:9 Featured Image path/prompt + Filename + Alt Text).
-2. **Clean, Publish-Ready Article** (`H1` → TOC → Body with `4+` media briefs → Optional FAQ → Concrete ending).
-3. **Pre-Publish SEO & Human-Writing Scorecard** (Word count, Keyword density `%`, Max paragraph length, Heading hierarchy check, Link/Media check, and `0` robotic-tells check).
+1. **SEO Metadata & 16:9 Featured Image Card**
+   - **Meta Title** (with exact character count, e.g. `54/60 chars`)
+   - **Meta Description** (with exact character count, e.g. `148/160 chars`)
+   - **URL Slug**
+   - **Primary Focus Keyword**
+   - **Secondary Keywords** (if any)
+   - **16:9 Featured Image** (saved path or 16:9 prompt + SEO filename + Alt Text)
+2. **Clean, Publish-Ready Article** (`H1` → Opening + 40–60w Quick Answer → TOC → Body with `4+` media briefs + Table → Optional FAQ → Concrete ending).
+3. **Copy-Paste JSON-LD Schema** (`Article` schema, plus `FAQPage` schema if FAQ was enabled).
+4. **Pre-Publish SEO & Human-Writing Scorecard** (Numeric `overall_score` out of `100`, word count, keyword density `%`, max paragraph length, heading hierarchy check, link/media check, and `0` robotic-tells check).

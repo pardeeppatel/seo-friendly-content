@@ -178,6 +178,127 @@ def audit_media_and_links(md: str, primary: str) -> dict:
     }
 
 
+STOP_WORDS = {"a", "an", "the", "for", "of", "in", "on", "to", "and", "or", "with", "by", "at", "from"}
+
+
+def check_slug(slug: str, primary: str) -> dict:
+    """Validate slug contains meaningful keyword tokens and stays concise."""
+    if not slug:
+        return {"text": "", "length": 0, "ok_concise": None, "keyword_present": None}
+    slug_norm = re.sub(r"[^a-z0-9]+", "-", slug.lower()).strip("-")
+    slug_tokens = set(slug_norm.split("-"))
+    kw_tokens = [t for t in re.findall(r"[a-z0-9]+", primary.lower()) if t not in STOP_WORDS]
+    if not kw_tokens:
+        kw_tokens = re.findall(r"[a-z0-9]+", primary.lower())
+    exact_match = primary.lower().replace(" ", "-") in slug_norm
+    tokens_match = bool(kw_tokens) and all(tok in slug_tokens for tok in kw_tokens)
+    return {
+        "text": slug,
+        "length": len(slug),
+        "ok_concise": len(slug) <= 60,
+        "keyword_present": exact_match or tokens_match,
+    }
+
+
+def compute_score(
+    total_words: int,
+    target_min: int | None,
+    seo_title: str,
+    title_len: int,
+    kw_in_title_first_half: bool | None,
+    meta_desc: str,
+    meta_len: int,
+    kw_in_meta: bool | None,
+    slug_info: dict,
+    kw_in_first_10_pct: bool,
+    primary_density_pct: float,
+    headings: dict,
+    long_paragraphs: list[dict],
+    media_links: dict,
+    robotic_count: int,
+) -> dict:
+    """Compute a transparent 0-100 on-page SEO and human-writing score."""
+    checks: dict[str, dict] = {}
+    max_applicable = 0
+    earned = 0
+
+    def add_check(name: str, pts: int, max_pts: int, passed: bool | str) -> None:
+        nonlocal max_applicable, earned
+        max_applicable += max_pts
+        earned += pts
+        checks[name] = {"score": pts, "max": max_pts, "status": passed}
+
+    if seo_title:
+        add_check("meta_title_length_<=60", 5 if title_len <= 60 else 0, 5, title_len <= 60)
+        add_check("keyword_in_title_first_50_pct", 5 if kw_in_title_first_half else 0, 5, bool(kw_in_title_first_half))
+    else:
+        checks["meta_title"] = {"score": 0, "max": 10, "status": "not_provided"}
+
+    if meta_desc:
+        add_check("meta_description_120_160", 5 if 120 <= meta_len <= 160 else 0, 5, 120 <= meta_len <= 160)
+        add_check("keyword_in_meta_description", 5 if kw_in_meta else 0, 5, bool(kw_in_meta))
+    else:
+        checks["meta_description"] = {"score": 0, "max": 10, "status": "not_provided"}
+
+    if slug_info["text"]:
+        slug_ok = bool(slug_info["keyword_present"] and slug_info["ok_concise"])
+        add_check("keyword_in_concise_slug", 5 if slug_ok else 0, 5, slug_ok)
+    else:
+        checks["url_slug"] = {"score": 0, "max": 5, "status": "not_provided"}
+
+    add_check("keyword_in_first_10_pct", 10 if kw_in_first_10_pct else 0, 10, kw_in_first_10_pct)
+
+    if total_words >= 2500 or (target_min is not None and total_words >= target_min and target_min >= 600):
+        wc_pts = 15 if total_words >= 2500 else 12 if total_words >= 2000 else 10 if total_words >= 1500 else 8 if total_words >= 1000 else 5
+    elif total_words >= 2000:
+        wc_pts = 12
+    elif total_words >= 1500:
+        wc_pts = 10
+    elif total_words >= 1000:
+        wc_pts = 7
+    elif total_words >= 600:
+        wc_pts = 4
+    else:
+        wc_pts = 0
+    add_check("content_depth_word_count", wc_pts, 15, wc_pts >= 10)
+
+    add_check("keyword_in_subheading", 5 if headings["primary_in_subheading"] else 0, 5, headings["primary_in_subheading"])
+    add_check("keyword_in_image_alt", 5 if media_links["primary_in_alt_text"] else 0, 5, media_links["primary_in_alt_text"])
+
+    if 1.0 <= primary_density_pct <= 1.5:
+        dens_pts, dens_ok = 5, True
+    elif 0.5 <= primary_density_pct <= 2.5:
+        dens_pts, dens_ok = 3, "acceptable"
+    else:
+        dens_pts, dens_ok = 0, False
+    add_check("keyword_density_1.0_to_1.5_pct", dens_pts, 5, dens_ok)
+
+    add_check("external_links_present", 5 if media_links["external_links"] >= 1 else 0, 5, media_links["external_links"] >= 1)
+    add_check("internal_links_present", 5 if media_links["internal_links_or_slots"] >= 1 else 0, 5, media_links["internal_links_or_slots"] >= 1)
+
+    h_ok = headings["h1_count"] == 1 and not headings["skipped_levels"]
+    add_check("heading_hierarchy_valid", 5 if h_ok else 0, 5, h_ok)
+    add_check("all_paragraphs_<=120_words", 5 if not long_paragraphs else 0, 5, not long_paragraphs)
+
+    media_cnt = media_links["total_media_items"]
+    media_pts = 5 if media_cnt >= 4 else 3 if media_cnt >= 1 else 0
+    add_check("media_count_4_plus", media_pts, 5, media_cnt >= 4)
+
+    ai_pts = 10 if robotic_count == 0 else 5 if robotic_count <= 2 else 0
+    add_check("human_writing_0_robotic_tells", ai_pts, 10, robotic_count == 0)
+
+    norm_pct = round((earned / max(1, max_applicable)) * 100)
+    rating = "Strong (81-100)" if norm_pct >= 81 else "Moderate (51-80)" if norm_pct >= 51 else "Weak (0-50)"
+
+    return {
+        "overall_score": earned,
+        "max_possible_on_provided_fields": max_applicable,
+        "normalized_score_pct": norm_pct,
+        "rating": rating,
+        "checks": checks,
+    }
+
+
 def scan_robotic_tells(md: str) -> list[dict]:
     """Scan text for overused robotic vocabulary, phrasing crutches, and leaks."""
     findings: list[dict] = []
@@ -236,21 +357,38 @@ def run_audit(args: argparse.Namespace) -> dict:
     meta_len = len(meta_desc)
     kw_in_meta = count_keyword_occurrences(meta_desc, primary) > 0 if meta_desc else None
 
-    slug = args.slug.strip()
-    kw_in_slug = (
-        primary.lower().replace(" ", "-") in slug.lower() if slug else None
-    )
-
+    slug_info = check_slug(args.slug.strip(), primary)
+    headings = audit_headings(raw, primary, secondary)
+    media_links = audit_media_and_links(raw, primary)
     robotic_tells = scan_robotic_tells(raw)
 
+    score_summary = compute_score(
+        total_words=total_words,
+        target_min=args.target_min,
+        seo_title=seo_title,
+        title_len=title_len,
+        kw_in_title_first_half=kw_in_title_first_half,
+        meta_desc=meta_desc,
+        meta_len=meta_len,
+        kw_in_meta=kw_in_meta,
+        slug_info=slug_info,
+        kw_in_first_10_pct=kw_in_first_10_pct,
+        primary_density_pct=primary_density_pct,
+        headings=headings,
+        long_paragraphs=long_paragraphs,
+        media_links=media_links,
+        robotic_count=len(robotic_tells),
+    )
+
     return {
+        "score_summary": score_summary,
         "word_count": total_words,
         "target_range": [args.target_min, args.target_max],
         "within_word_target": (
             (args.target_min is None or total_words >= args.target_min)
             and (args.target_max is None or total_words <= args.target_max)
         ),
-        "seo_title": {
+        "meta_title": {
             "length": title_len,
             "ok_under_60": title_len <= 60 if seo_title else None,
             "keyword_in_first_50_pct": kw_in_title_first_half,
@@ -260,10 +398,7 @@ def run_audit(args: argparse.Namespace) -> dict:
             "ok_120_to_160": 120 <= meta_len <= 160 if meta_desc else None,
             "keyword_present": kw_in_meta,
         },
-        "slug": {
-            "text": slug,
-            "keyword_present": kw_in_slug,
-        },
+        "slug": slug_info,
         "keywords": {
             "primary": primary,
             "primary_count": primary_count,
@@ -281,12 +416,12 @@ def run_audit(args: argparse.Namespace) -> dict:
             ),
             "keyword_in_first_10_pct": kw_in_first_10_pct,
         },
-        "headings": audit_headings(raw, primary, secondary),
+        "headings": headings,
         "paragraphs": {
             "total": len(paragraphs),
             "over_120_words": long_paragraphs,
         },
-        "media_and_links": audit_media_and_links(raw, primary),
+        "media_and_links": media_links,
         "human_writing_scan": {
             "issues_count": len(robotic_tells),
             "issues": robotic_tells,

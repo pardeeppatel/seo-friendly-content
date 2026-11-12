@@ -16,9 +16,9 @@
 
 | Check | Scope | Exact Requirement |
 | :--- | :--- | :--- |
-| **Focus Keyword in SEO Title** | Primary only | Include Primary Focus Keyword in SEO Title, ideally within the **first 50 characters** (desktop SERPs display ~60 chars; mobile ~50 chars). |
-| **Focus Keyword in Meta Description** | Primary only | Include Primary Focus Keyword within **120–160 characters**. Summarize value and match search intent to drive CTR. |
-| **Focus Keyword in URL Slug** | Primary only | Include Primary Focus Keyword in a clean, descriptive, lowercase slug. |
+| **Focus Keyword in Meta Title** | Primary only | Include Primary Focus Keyword in Meta Title within the **first 50%** (ideally **first 50 characters**). Keep total Meta Title **50–60 characters** (max 60) so desktop and mobile SERPs display it without truncation. |
+| **Focus Keyword in Meta Description** | Primary only | Include Primary Focus Keyword within **120–160 characters** (sweet spot **140–155 characters** for desktop + mobile SERPs). Summarize value and match search intent to drive CTR. |
+| **Focus Keyword in URL Slug** | Primary only | Include meaningful Primary Focus Keyword terms in a clean, descriptive, lowercase slug (trim filler/stop words). |
 | **Keyword in First 10% of Content** | Primary only | Appear naturally within the **first 10%** of the article (or anywhere in the post if `< 300` words). |
 | **Focus Keyword in Content** | Primary + Secondary | Include all focus keywords naturally across the body (singular/plural supported). |
 | **Overall Content Length** | Content-only | `> 2,500` words = 100% \| `2,000–2,500` = 70% \| `1,500–2,000` = 60% \| `1,000–1,500` = 40% \| `600–1,000` = 20% \| `< 600` = 0%. *(Exception: Product pages ~200+ words.)* |
@@ -61,3 +61,11 @@
 - **Broken Heading Hierarchy:** Exactly **one `H1`** per page; never skip heading levels (`H1 → H2 → H3 → H4`).
 - **Stale / Outdated Content:** Use up-to-date statistics, current-year context, and verified references.
 - **Missing Schema Readiness:** Structure FAQs, How-Tos, and Product specs cleanly so they map directly to structured data (FAQ / Article / HowTo / Product Schema).
+
+---
+
+## 6. Featured Snippets & AI-Search Readiness (GEO / AEO)
+To maximize reach in both traditional SERPs and AI-generated answer boxes:
+- **40–60 Word Direct Quick Answer:** Place a concise, self-contained answer block right after the opening hook (or under key question headings) so search engines can extract it cleanly for featured snippets and AI citations.
+- **Structured Comparison Tables & Steps:** Include at least one clean Markdown table or numbered step block summarizing specs, pros/cons, or workflows.
+- **Copy-Paste JSON-LD Schema:** Emit valid `Article` JSON-LD (and `FAQPage` JSON-LD when an FAQ section is included) matching the exact Meta Title, Meta Description, and Q&A pairs.
