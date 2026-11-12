@@ -103,10 +103,9 @@ Follow [`references/on-page-seo-rules.md`](./references/on-page-seo-rules.md) st
   - Include a **Table of Contents** for posts `≥ 1,000` words and at least **1 structured comparison/summary table**.
   - Keep **every paragraph under 120 words** (target 2–4 sentences / ~40–80 words; zero walls of text).
   - Provide real value: concrete examples, actionable steps, real-world experience (from Phase 3 if supplied), and original takeaways (never thin filler).
-- **Media Briefs (`4+` visuals for maximum media score):**
-  - Include at least **4** in-article image/diagram/video briefs (plus the 16:9 Featured Image), each specifying:
-    - Descriptive SEO filename (`.jpg` for photos, `.png` for diagrams/graphics with transparency)
-    - `Alt Text` containing the Primary Focus Keyword (naturally on primary visuals)
+- **In-Article Visuals & Media Briefs (`4+` visuals for maximum media score):**
+  - Include at least **4** in-article visuals or media briefs (in addition to the 16:9 Featured Image), each with a descriptive SEO filename (`.jpg` for photos/editorial visuals, `.png` for graphics) and `Alt Text` containing the Primary Focus Keyword on primary visuals.
+  - When an image-generation tool or subagent is available, generate applicable clean in-article images (see `4D`) and embed them directly as `![<Alt Text>](./images/<seo-filename>)`; use clean Mermaid diagrams or concise Media Briefs only where dense readable text or live product screenshots are needed.
 - **FAQ Block & JSON-LD Schema (always include `Article`; add `FAQPage` if user chose `Yes`):**
   - Add `4–6` concise, high-intent questions (`H2: Frequently Asked Questions` → `H3` per question) with direct, schema-ready answers when FAQ is enabled.
   - Generate valid copy-paste **JSON-LD Schema** (`Article`, plus `FAQPage` when FAQ is included) matching the exact Meta Title, Meta Description, and Q&A content. When `website_url` is configured, populate `mainEntityOfPage.@id`, `publisher.name`, `publisher.url`, and featured `image` paths with `<website_url>/<url-slug>`.
@@ -120,15 +119,25 @@ Review the entire draft against [`references/human-writing-rules.md`](./referenc
 - **No Formulaic Closings or Templates:** Do not use `"Challenges and Future Prospects"` or `"In conclusion"` / `"In summary"` / `"Overall"` sections. End with concrete next steps or a direct takeaway.
 - **Clean Formatting & Zero Meta-Chatter:** No emoji icons in headings/lists, no bold-label bullet spam (`**Point**: explanation`), no spaced em-dash (` — `) punch-up overuse, and no conversational filler inside the article body.
 
-#### 4D. Branded Featured Image Generation (16:9 Website-Ready)
-Every completed article must include a **16:9 featured image** ready to post directly on the user's website:
-1. Craft a clean, topic-matched **16:9 visual concept** tied directly to the confirmed title and Primary Focus Keyword (avoid cluttered text overlays inside generated visuals).
-2. **Optional Website Branding:** If `website_url` (or `brand_name`) is set in `user-config.json` or prompt context, add a **subtle, crisp domain badge or corner watermark** (e.g., minimalist bottom-right pill or clean editorial corner typography reading `<domain>` such as `YourSite.com`) without obscuring the main subject. Inspect the generated image visually to confirm the domain spelling is accurate and clean.
-3. **If an image-generation tool or subagent is available:**
-   - Generate the **16:9 aspect ratio** featured image directly and save/copy it into the article's folder (`<output_dir>/<url-slug>/<url-slug>-featured.jpg` or `.png`).
-   - Return the **saved image path**, **SEO filename** (`<url-slug>-featured.jpg` / `.png`), and **Alt Text** (containing the Primary Focus Keyword).
+#### 4D. Niche-Matched Visuals: Branded 16:9 Featured Image & In-Article Images
+Every completed article must include custom visuals tailored to its topic vibe (never a repetitive template):
+
+1. **Niche-Matched Visual Direction & Anti-Cliché Rule (Mandatory):**
+   - **Never repeat a generic template:** Do **not** default to *"desk + laptop + notebook + coffee cup"* unless the topic is specifically about desk setups, stationery, or journaling.
+   - **Match style, setting, palette & lighting to the article's niche and search intent:**
+     - *Travel / Study Abroad / Cities:* Real atmospheric destination, transit, or architectural photography in natural light (not an indoor study desk).
+     - *Tech / SaaS / Developer / AI:* Sleek 3D isometric architecture metaphors, dark-mode minimal geometry, or clean hardware/interface macro photography.
+     - *Comparisons ("X vs Y") / Decisions:* Split-frame dual-tone visual contrast or balanced symbolic object pairing with high negative space.
+     - *Product / Gear Reviews:* Studio hero macro shot with directional rim lighting and shallow depth of field.
+     - *Finance / Legal / Strategy:* Minimalist editorial illustration, modern architectural lines, or symbolic 3D sculpture concepts.
+     - *Health / Wellness / Food / Home:* Natural daylight documentary or crisp texture-rich studio photography.
+   - **Vary Framing:** Rotate wide environmental shots, shallow-DOF macros, split comparisons, and minimal illustrations so every post—and every image inside a post—feels custom art-directed.
+2. **Optional Website Branding (Featured Image):** If `website_url` (or `brand_name`) is set in `user-config.json` or prompt context, add a **subtle, crisp domain badge or corner watermark** (e.g., minimalist bottom-right pill or clean editorial corner typography reading `<domain>` such as `YourSite.com`) without obscuring the main subject. Inspect the generated image visually to confirm accurate spelling and clean composition.
+3. **Generate 16:9 Featured Image + Applicable In-Article Images (when image-gen tool/subagent is available):**
+   - **16:9 Featured Image:** Generate a `16:9` aspect-ratio featured image matching the niche direction above, and save/copy it to `<output_dir>/<url-slug>/<url-slug>-featured.jpg` (or `.png`). Return its saved path, SEO filename, and Alt Text.
+   - **In-Article Images (`images/`):** For each in-article visual slot where conceptual, photographic, architectural, comparison, or illustrated imagery applies cleanly (avoiding visuals that depend on tiny paragraphs of AI-rendered text), generate the actual image too, save it as `<output_dir>/<url-slug>/images/<in-article-seo-filename>.jpg` (or `.png`), visually inspect it, and embed `![<Alt Text>](./images/<in-article-seo-filename>.jpg)` directly inside `article.md`. For dense step-by-step text charts or UI screenshots where AI text rendering is unsuitable, keep clean Mermaid diagrams or concise Media Briefs instead.
 4. **If no image-generation tool is available** in the current environment:
-   - Output a ready-to-run **16:9 Featured Image Prompt** (explicitly specifying `16:9` widescreen editorial composition + subtle corner branding `<domain>` when `website_url` is set), **SEO Filename**, and **Alt Text** so the user can generate and save it into `<output_dir>/<url-slug>/` immediately.
+   - Output a ready-to-run **16:9 Featured Image Prompt** (following the niche direction + subtle `<domain>` corner branding when `website_url` is set) plus custom niche-matched prompts, **SEO Filenames**, and **Alt Text** for all in-article visual briefs.
 
 #### 4E. Automated SEO & Human-Writing Audit
 Before saving and sending the final response, run the local audit script if shell access is available:
@@ -145,9 +154,10 @@ python3 <skill_path>/scripts/audit_seo_content.py <output_dir>/<url-slug>/articl
 ```
 
 #### 4F. Save Organized Article Bundle (`<output_dir>/<url-slug>/`)
-Inside the user's saved `output_dir`, create a dedicated subfolder named after the article's **URL Slug** (`<output_dir>/<url-slug>/`) so every article and its matching image stay neatly isolated and easy to manage:
-- `<output_dir>/<url-slug>/article.md` — clean publish-ready article (or `article.html` if requested)
-- `<output_dir>/<url-slug>/<url-slug>-featured.jpg` *(or `.png`)* — 16:9 featured image renamed cleanly to its exact SEO filename
+Inside the user's saved `output_dir`, create a dedicated subfolder named after the article's **URL Slug** (`<output_dir>/<url-slug>/`) so every article and all of its images stay neatly isolated and easy to manage:
+- `<output_dir>/<url-slug>/article.md` — clean publish-ready article (or `article.html` if requested) with generated images embedded cleanly
+- `<output_dir>/<url-slug>/<url-slug>-featured.jpg` *(or `.png`)* — branded 16:9 featured image renamed cleanly to its exact SEO filename
+- `<output_dir>/<url-slug>/images/<seo-filename>.jpg` *(or `.png`)* — generated in-article visuals (when applicable)
 - `<output_dir>/<url-slug>/seo-metadata.md` — Meta Title, Meta Description, URL Slug, Primary/Secondary Keywords, Website URL, Featured Image Alt Text, and Audit Scorecard
 - `<output_dir>/<url-slug>/schema.json` — valid JSON-LD `Article` (+ optional `FAQPage`) schema
 

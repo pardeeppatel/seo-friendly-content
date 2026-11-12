@@ -25,8 +25,8 @@
 3. **Full On-Page SEO Compliance:** Enforces clean URL slugs (`≤ 75` chars total URL), meta descriptions (`120–160` chars), first-10% keyword placement, `1.0%–1.5%` keyword density (without awkward pseudo-stuffing), strict `H1 → H2 → H3` hierarchy, Table of Contents, short paragraphs (`≤ 120` words), `4+` media briefs with alt text, and authoritative external/internal link slots.
 4. **Human-Writing Guardrails:** Actively strips robotic vocabulary clusters, trailing `-ing` puffery, negative parallelisms, rule-of-three padding, spaced em-dash spam, and placeholder leaks.
 5. **Up-to-Date Grounding (Zero Dummy Data):** Uses real, current facts and verifiable sources with zero fabricated URLs or fake statistics.
-6. **16:9 Website-Ready Featured Image (with Optional Site Branding):** Generates (or prepares) a 16:9 featured image saved cleanly with its SEO filename, keyword-rich alt text, and subtle corner branding when you provide your main Website URL.
-7. **Organized Per-Article Folder Management:** Asks once for your designated output folder (remembered across future sessions in `user-config.json`), then creates a clean `<output_dir>/<url-slug>/` bundle for every article (`article.md`, `<url-slug>-featured.jpg`, `seo-metadata.md`, and `schema.json`).
+6. **Niche-Matched Branded Visuals (16:9 Featured + In-Article Images):** Generates a custom 16:9 featured image styled to match the topic's vibe (avoiding repetitive desk-cliché stock looks) with optional domain corner branding, plus generates clean in-article visuals in `images/` when applicable.
+7. **Organized Per-Article Folder Management:** Asks once for your designated output folder (remembered across future sessions in `user-config.json`), then creates a clean `<output_dir>/<url-slug>/` bundle for every article (`article.md`, `<url-slug>-featured.jpg`, `images/`, `seo-metadata.md`, and `schema.json`).
 8. **Deterministic Python Auditor:** Verifies word count, keyword density, heading structure, paragraph lengths, internal/external links (`--site-url`), and scans for robotic writing patterns before final delivery.
 
 ### Why Use This Over Default AI Prompts?
@@ -38,7 +38,7 @@
 | Keyword Density & SERP Limits | Keyword stuffing or missing meta tags | Enforces **1.0%–1.5% density**, `≤ 60`-char Meta Title, `120–160`-char Meta Description & concise URL slug |
 | Human Writing Quality | Heavy AI buzzwords & fluff closings | Strips **26+ robotic words**, `-ing` puffery, negative parallelisms, rule-of-three & template closings |
 | Research & Linking | Fake stats, broken links & placeholders | Verified HTTP sources, zero placeholders, plus **real same-site links** when your Website URL is set |
-| Featured Image & Files | Raw chat text only | **Branded 16:9 featured image**, `Article` + `FAQPage` JSON-LD & clean **`<folder>/<slug>/`** file bundle |
+| Featured Image & Files | Raw chat text only | **Niche-matched branded 16:9 featured + in-article `images/`**, JSON-LD & clean **`<folder>/<slug>/`** bundle |
 | Quality Verification | None | Deterministic **0–100 Python SEO & anti-AI audit** before final output |
 
 ---
